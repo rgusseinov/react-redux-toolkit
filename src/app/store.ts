@@ -1,11 +1,21 @@
-import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from '../features/counter/counter-slice';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { postApi } from "../features/post-service";
+import userReducer from "../reducers/user-slice";
+// import { logger } from "../middleware/logger";
 
-export const store = configureStore({
-	reducer: {
-		counter: counterReducer,
-	}
+export const rootReducers = combineReducers({
+	userReducer,
+	[postApi.reducerPath]: postApi.reducer
 });
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+export const setupStore = () => {
+	return configureStore({
+		reducer: rootReducers,
+		middleware: (getDefaultMiddleware) =>
+			getDefaultMiddleware().concat(postApi.middleware),
+	});
+};
+
+export type RootState = ReturnType<typeof rootReducers>;
+export type AppStore = ReturnType<typeof setupStore>;
+export type AppDispatch = AppStore['dispatch'];

@@ -1,19 +1,42 @@
 import { useAppDispatch, useAppSelector } from './app/hooks'
-import { incremented } from './features/counter/counter-slice'
+import { useEffect } from 'react';
+import { addUser, fetchUsers } from './reducers/action-creators';
 import './App.css'
 
 function App() {
-  const count = useAppSelector((state) => state.counter.value);
-  const dispatch = useAppDispatch();
-  const handleClick = () => dispatch(incremented());
+  const dispatch = useAppDispatch()
+  const { users, isLoading, error } = useAppSelector(state => state.userReducer);
+
+  useEffect(() => {
+    dispatch(fetchUsers())
+  }, [])
+
+  const handleAddUser = () => {
+    const name = prompt() || "Default name";
+    dispatch(addUser({ id: 11, name, email: "r.gusseinov@mail.ru" }))
+  }
 
   return (
     <>
-      <h1>Vite + React</h1>
+      <h2>Simple blog</h2>
+      <button onClick={handleAddUser}>Add User</button>
+
+      {isLoading && <h1>Идет загрузка...</h1>}
+      {error && <h1>{error}</h1>}
+
+      {
+        users && users.map(user => (
+          <div key={user.id} style={{ borderBottom: "1px solid grey", paddingBottom: "15px" }}>
+            <h3>{user.name}</h3>
+            <p>{user.username}</p>
+            <p>{user.email}</p>
+          </div>
+        ))
+      }
+
       <div className="card">
-        <button onClick={handleClick}>
-          count is {count}
-        </button>
+        {/* <UserContainer /> */}
+        {/* <PostContainer /> */}
       </div>
     </>
   )
